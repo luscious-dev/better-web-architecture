@@ -181,4 +181,82 @@ Resources:
       AllocationId: !GetAtt [NatGateway2EIP, AllocationId]
       SubnetId: !Ref PublicSubnet2
 
-# Outputs:  
+Outputs:  
+  VpcOut:
+    Description: VPC id of the network stack
+    Values: !Ref VPC
+    Export:
+      Name: !Sub ${EnvironmentName}-VPC
+
+  PublicSubnetOut1:
+    Description: ID of the public subnet in AZ1
+    Values: !Ref PublicSubnet1
+    Export:
+      Name: !Sub ${EnvironmentName}-PUB-NET-1
+
+  PublicSubnetOut2:
+    Description: ID of the public subnet in AZ2
+    Values: !Ref PublicSubnet2
+    Export:
+      Name: !Sub ${EnvironmentName}-PUB-NET-2
+
+  PublicSubnets:
+    Description: A list of all the public subnets
+    Values: !Join [",", [!Ref PublicSubnet1, !Ref PublicSubnet2]]
+    Export:
+      Name: !Sub ${EnvironmentName}-PUB-NETS
+
+  WebSubnet1:
+    Description: ID of the private web subnet in AZ1
+    Values: !Ref WebSubnetPRIV1
+    Export:
+      Name: !Sub ${EnvironmentName}-WEB-1
+
+  WebSubnet2:
+    Description: ID of the private web subnet in AZ2
+    Values: !Ref WebSubnetPRIV2
+    Export:
+      Name: !Sub ${EnvironmentName}-WEB-1
+
+  WebSubnets:
+    Description: A list of private web subnets
+    Values: !Join [",", [!Ref WebSubnetPRIV1, !Ref WebSubnetPRIV2]]
+    Export:
+      Name: !Sub ${EnvironmentName}-WEBS
+
+  DBSubnet1:
+    Description: ID of the private db subnet in AZ1
+    Values: !Ref DBSubnetMainPRIV1
+    Export:
+      Name: !Sub ${EnvironmentName}-DB-1
+
+  DBSubnet2:
+    Description: ID of the private db subnet in AZ2
+    Values: !Ref DBSubnetMainPRIV2
+    Export:
+      Name: !Sub ${EnvironmentName}-DB-2
+
+  DBSubnets:
+    Description: A list of private db subnets
+    Values: !Join [",", [!Ref DBSubnetMainPRIV1, !Ref DBSubnetMainPRIV2]]
+    Export:
+      Name: !Sub ${EnvironmentName}-DBS
+
+  AppSubnet1:
+    Description: ID of the private application subnet in AZ1
+    Values: !Ref AppSubnetPRIV1
+    Export:
+      Name: !Sub ${EnvironmentName}-APP-1
+
+  AppSubnet2:
+    Description: ID of the private applicatino subnet in AZ2
+    Values: !Ref AppSubnetPRIV2
+    Export:
+      Name: !Sub ${EnvironmentName}-APP-2
+
+  AppSubnets:
+    Description: A list of private application subnets
+    Values: !Join [",", [!Ref AppSubnetPRIV1, !Ref AppSubnetPRIV2]]
+    Export:
+      Name: !Sub ${EnvironmentName}-APPS
+
