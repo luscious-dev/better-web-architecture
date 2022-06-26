@@ -1,0 +1,184 @@
+AWSTemplateFormatVersion: 2010-09-09
+Description: >
+  Olawale Akin-Odanye / Better cloud cloud architecture
+
+Parameters: 
+  EnvironmentName:
+    Type: String
+    Description: Name to be used to identify resources from this stack
+  vpcCIDR:
+    Type: String
+    Description: VPC CidrBlock of the private
+  PublicSubnet1CIDR:
+    Type: String
+    Description: CIDR block for the public subnet in availability zone 1
+  PublicSubnet2CIDR:
+    Type: String
+    Description: CIDR block for the public subnet in availability zone 2
+  WebSubnetPrivCIDR1:
+    Type: String
+    Description: CIDR block for the web private subnet in availability zone 1
+  WebSubnetPrivCIDR2:
+    Type: String
+    Description: CIDR block for the web private subnet in availability zone 2
+  AppSubnetPrivCIDR1:
+    Type: String
+    Description: CIDR block for application web private subnet in availability zone 1
+  AppSubnetPrivCIDR2:
+    Type: String
+    Description: CIDR block for application web private subnet in availability zone 2
+  DBSubnetPrivCIDR1:
+    Type: String
+    Description: CIDR block for database private subnet in availability zone 1
+  DBSubnetPrivCIDR2:
+    Type: String
+    Description: CIDR block for database private subnet in availability zone 2
+
+  
+Resources:
+# General VPC
+  VPC:
+    Type: AWS::EC2::VPC
+    Properties:
+      CidrBlock: !Ref vpcCIDR
+      Tags:
+        - Key: Name
+          Value: !Sub ${EnvironmentName}-VPC
+
+  VpcGateway:
+    Type: AWS::EC2::InternetGateway
+    Properties:
+      Tags:
+        - Key: Name
+          Value: !Sub ${EnvironmentName}-VPC-Gateway
+
+  VpcAttachGateway:
+    Type: AWS::EC2::VPCGatewayAttachment
+    Properties:
+      InternetGatewayId: !Ref VpcGateway
+      VpcId: !Ref VPC
+  
+  # Availabiliy Zone 1
+  PublicSubnet1:
+    Type: AWS::EC2::Subnet
+    Properties:
+      VpcId: !Ref VPC
+      AvailabilityZone: !Select [0, !GetAZs '']
+      CidrBlock: !Ref PublicSubnet1CIDR
+      MapPublicIpOnLaunch: True
+      Tags:
+        - Key: Name
+          Value: !Sub ${EnvironmentName}-PUB-SUB-1
+
+  WebSubnetPRIV1:
+    Type: AWS::EC2::Subnet
+    Properties:
+      VpcId: !Ref VPC
+      AvailabilityZone: !Select [0, !GetAZs '']
+      CidrBlock: !Ref WebSubnetPrivCIDR1
+      MapPublicIpOnLaunch: True
+      Tags:
+        - Key: Name
+          Value: !Sub ${EnvironmentName}--WEB-SUB-1
+
+  AppSubnetPRIV1:
+    Type: AWS::EC2::Subnet
+    Properties:
+      VpcId: !Ref VPC
+      AvailabilityZone: !Select [0, !GetAZs '']
+      CidrBlock: !Ref AppSubnetPrivCIDR1
+      MapPublicIpOnLaunch: True
+      Tags:
+        - Key: Name
+          Value: !Sub ${EnvironmentName}-APP-SUB-1
+
+  DBSubnetMainPRIV1:
+    Type: AWS::EC2::Subnet
+    Properties:
+      VpcId: !Ref VPC
+      AvailabilityZone: !Select [0, !GetAZs '']
+      CidrBlock: !Ref DBSubnetPrivCIDR1
+      MapPublicIpOnLaunch: True
+      Tags:
+        - Key: Name
+          Value: !Sub ${EnvironmentName}-DB-SUB-1
+  
+  NatGateway1EIP:
+    Type: AWS::EC2::EIP
+    DependsOn: VpcAttachGateway
+    Properties:
+      Domain: vpc
+      Tags:
+        - Key: Name
+          Value: !Sub ${EnvironmentName}-NAT-EIP-1
+
+  NatGateway1:
+    Type: AWS::EC2::NatGateway
+    Properties:
+      AllocationId: !GetAtt [NatGateway1EIP, AllocationId]
+      SubnetId: !Ref PublicSubnet1
+
+  # Availability Zone 2
+  PublicSubnet2:
+    Type: AWS::EC2::Subnet
+    Properties:
+      VpcId: !Ref VPC
+      AvailabilityZone: !Select [1, !GetAZs '']
+      CidrBlock: !Ref PublicSubnet2CIDR
+      MapPublicIpOnLaunch: True
+      Tags:
+        - Key: Name
+          Value: !Sub ${EnvironmentName}-PUB-SUB-2
+
+
+  WebSubnetPRIV2:
+    Type: AWS::EC2::Subnet
+    Properties:
+      VpcId: !Ref VPC
+      AvailabilityZone: !Select [1, !GetAZs '']
+      CidrBlock: !Ref WebSubnetPrivCIDR2
+      MapPublicIpOnLaunch: True
+      Tags:
+        - Key: Name
+          Value: !Sub ${EnvironmentName}--WEB-SUB-2
+
+
+  AppSubnetPRIV2:
+    Type: AWS::EC2::Subnet
+    Properties:
+      VpcId: !Ref VPC
+      AvailabilityZone: !Select [1, !GetAZs '']
+      CidrBlock: !Ref AppSubnetPrivCIDR2
+      MapPublicIpOnLaunch: True
+      Tags:
+        - Key: Name
+          Value: !Sub ${EnvironmentName}-APP-SUB-2
+
+
+  DBSubnetReplicaPRIV2:
+    Type: AWS::EC2::Subnet
+    Properties:
+      VpcId: !Ref VPC
+      AvailabilityZone: !Select [1, !GetAZs '']
+      CidrBlock: !Ref DBSubnetPrivCIDR2
+      MapPublicIpOnLaunch: True
+      Tags:
+        - Key: Name
+          Value: !Sub ${EnvironmentName}-DB-SUB-2
+
+  NatGateway2EIP:
+    Type: AWS::EC2::EIP
+    DependsOn: VpcAttachGateway
+    Properties:
+      Domain: vpc
+      Tags:
+        - Key: Name
+          Value: !Sub ${EnvironmentName}-NAT-EIP-2
+
+  NatGateway2:
+    Type: AWS::EC2::NatGateway
+    Properties:
+      AllocationId: !GetAtt [NatGateway2EIP, AllocationId]
+      SubnetId: !Ref PublicSubnet2
+
+# Outputs:  
